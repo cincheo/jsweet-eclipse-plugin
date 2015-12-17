@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="JSweet" url="http://eclipse-update-site.jsweet.org">
+      JSweet transpiler update site
+   </description>
+   <feature url="features/org.jsweet.feature_0.9.1.201512081614.jar" id="org.jsweet.feature" version="0.9.1.201512081614">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.1.201512081616.jar" id="org.jsweet.feature" version="0.9.1.201512081616">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.1.201512141810.jar" id="org.jsweet.feature" version="0.9.1.201512141810">
+      <category name="JSweet"/>
+   </feature>
+   <category-def name="JSweet" label="JSweet">
+      <description>
+         The JSweet transpiler Eclipse plugin
+      </description>
+   </category-def>
+</site>

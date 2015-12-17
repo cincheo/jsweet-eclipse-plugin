@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="jsweetBuilder"
+         name="JSweet Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.jsweet.plugin.builder.JSweetBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="jsweetNature"
+         name="JSweet Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.jsweet.plugin.builder.JSweetNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.jsweet.plugin.jsweetBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="JSweet Project Nature commands"
+            id="org.jsweet.plugin.jsweetNature.category">
+      </category>
+      <command
+            name="Add/RemoveJSweet Project Nature"
+            defaultHandler="org.jsweet.plugin.builder.AddRemoveJSweetNatureHandler"
+            categoryId="org.jsweet.plugin.jsweetNature.category"
+            id="org.jsweet.plugin.addRemoveJSweetNature">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+         <command
+               commandId="org.jsweet.plugin.addRemoveJSweetNature"
+               label="Disable JSweet builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <test
+                              value="org.jsweet.plugin.jsweetNature"
+                              property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.jsweet.plugin.addRemoveJSweetNature"
+               label="Enable JSweet builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <not>
+                           <test
+                                 value="org.jsweet.plugin.jsweetNature"
+                                 property="org.eclipse.core.resources.projectNature">
+                           </test>
+                        </not>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         id="jsweetProblem"
+         name="JSweet Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.jsweet.plugin.preferences.JSweetPreferencePage"
+            id="org.jsweet.plugin.preferences.JSweetPreferencePage"
+            name="JSweet">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.jsweet.plugin.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.jsweet.plugin.preferences.JSweetPreferencePage"
+            id="org.jsweet.plugin.properties.jsweetPreferencePage"
+            name="JSweet">
+         <enabledWhen>
+			 <adapt type="org.eclipse.core.resources.IProject">
+				<and>
+					<instanceof value="org.eclipse.core.resources.IProject">
+					</instanceof>
+				</and>
+			</adapt>
+         </enabledWhen>
+      </page>
+   </extension>
+</plugin>
