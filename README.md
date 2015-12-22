@@ -4,11 +4,8 @@
 
 
 - Under [Eclipse](https://eclipse.org/home/index.php), go to: `Help > Install New Software`.
-- Press the "Add..." button to add the JSweet.org update site.
-
-Update site URL: `http://eclipse-update-site.jsweet.org`
-
--Follow the installation instructions (keep the default options) and restart Eclipse when prompted.
+- Press the "Add..." button to add the JSweet.org update site. Update site URL: `http://eclipse-update-site.jsweet.org`
+- Follow the installation instructions (keep the default options) and restart Eclipse when prompted.
 
 ## How to start from the quick start project
 
