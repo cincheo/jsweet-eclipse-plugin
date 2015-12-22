@@ -1,4 +1,4 @@
-# The offial Eclipse plugin for the JSweet transpiler
+# Eclipse plugin for the [JSweet transpiler](https://github.com/cincheo/jsweet)
 
 ## Installation
 
