@@ -346,6 +346,10 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 		@Override
 		public void report(JSweetProblem problem, SourcePosition sourcePosition, String message) {
+			if(problem==JSweetProblem.INTERNAL_JAVA_ERROR) {
+				// ignore Java errors because they will be reported by Eclipse
+				return;
+			}
 			String base = getProject().getLocation().toFile().getAbsolutePath();
 			if (sourcePosition == null || sourcePosition.getFile() == null) {
 				addMarker(getProject(), message, -1, -1, -1,
@@ -411,9 +415,6 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			}
 		}
 
-		@Override
-		public void reportSilentError() {
-		}
 	}
 
 	private void addMarker(IResource resource, String message, int lineNumber, int charStart, int charEnd,
