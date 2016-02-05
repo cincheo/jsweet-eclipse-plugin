@@ -57,6 +57,7 @@ public class AddRemoveJSweetNatureHandler extends AbstractHandler {
 				System.arraycopy(natures, i + 1, newNatures, i, natures.length - i - 1);
 				description.setNatureIds(newNatures);
 				project.setDescription(description, null);
+				JSweetBuilder.clean(project, null);
 				return;
 			}
 		}
@@ -67,6 +68,7 @@ public class AddRemoveJSweetNatureHandler extends AbstractHandler {
 		newNatures[natures.length] = JSweetNature.ID;
 		description.setNatureIds(newNatures);
 		project.setDescription(description, null);
+		JSweetBuilder.clean(project, null);
 	}
 
 }

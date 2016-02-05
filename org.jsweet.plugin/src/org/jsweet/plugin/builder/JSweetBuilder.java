@@ -117,8 +117,40 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					FileUtils.deleteQuietly(jsOutDir);
 				}
 			}
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void autoFillClassPath(IProject project) throws CoreException {
+		if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
+			IJavaProject javaProject = JavaCore.create(project);
+			IClasspathEntry[] cp = javaProject.getRawClasspath();
+			File processed = project.getLocation().append(JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
+					+ CandiesProcessor.CANDIES_PROCESSED_DIR_NAME).toFile();
+			IClasspathEntry e = javaProject
+					.decodeClasspathEntry("<classpathentry kind=\"lib\" path=\"" + JSweetTranspiler.TMP_WORKING_DIR_NAME
+							+ File.separator + CandiesProcessor.CANDIES_PROCESSED_DIR_NAME + "\" sourcepath=\""
+							+ JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
+							+ CandiesProcessor.CANDIES_SOURCES_DIR_NAME + "\" />");
+			if (project.isNatureEnabled(JSweetNature.ID)) {
+				if (!processed.exists()) {
+					processed.mkdirs();
+					project.refreshLocal(IResource.DEPTH_INFINITE, null);
+				}
+				if (!ArrayUtils.contains(cp, e)) {
+					Log.info("adding " + e + " to build path");
+					cp = ArrayUtils.add(cp, 0, e);
+					javaProject.setRawClasspath(cp, true, null);
+				}
+			} else {
+				if (ArrayUtils.contains(cp, e)) {
+					Log.info("removing " + e + " from build path");
+					cp = ArrayUtils.remove(cp, ArrayUtils.indexOf(cp, e));
+					javaProject.setRawClasspath(cp, true, null);
+				}
+			}
 		}
 	}
 
@@ -127,26 +159,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		// mixins are available
 		File tmp = project.getLocation().append(JSweetTranspiler.TMP_WORKING_DIR_NAME).toFile();
 		FileUtils.deleteQuietly(tmp);
-		if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-			IJavaProject javaProject = JavaCore.create(project);
-			IClasspathEntry[] cp = javaProject.getRawClasspath();
-			File processed = project.getLocation().append(JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-					+ CandiesProcessor.CANDIES_PROCESSED_DIR_NAME).toFile();
-			if (!processed.exists()) {
-				processed.mkdirs();
-				project.refreshLocal(IResource.DEPTH_INFINITE, null);
-			}
-			IClasspathEntry e = javaProject
-					.decodeClasspathEntry("<classpathentry kind=\"lib\" path=\"" + JSweetTranspiler.TMP_WORKING_DIR_NAME
-							+ File.separator + CandiesProcessor.CANDIES_PROCESSED_DIR_NAME + "\" sourcepath=\""
-							+ JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-							+ CandiesProcessor.CANDIES_SOURCES_DIR_NAME + "\" />");
-			if (!ArrayUtils.contains(cp, e)) {
-				Log.info("adding " + e + " to build path");
-				cp = ArrayUtils.add(cp, 0, e);
-				javaProject.setRawClasspath(cp, true, null);
-			}
-		}
+		autoFillClassPath(project);
 		// delete markers set and files created
 		cleanFiles(project);
 	}
@@ -346,7 +359,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 		@Override
 		public void report(JSweetProblem problem, SourcePosition sourcePosition, String message) {
-			if(problem==JSweetProblem.INTERNAL_JAVA_ERROR) {
+			if (problem == JSweetProblem.INTERNAL_JAVA_ERROR) {
 				// ignore Java errors because they will be reported by Eclipse
 				return;
 			}
