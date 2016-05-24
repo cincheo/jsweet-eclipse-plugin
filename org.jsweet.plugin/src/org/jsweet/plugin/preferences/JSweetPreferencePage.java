@@ -77,14 +77,22 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 
 	@Override
 	protected void createFieldEditors() {
+		this.addField(new StringFieldEditor(Preferences.COMPILER_SOURCE_FOLDERS,
+				"Source folders (project's source folders if empty)", this.getFieldEditorParent()));
+		this.addField(new StringFieldEditor(Preferences.COMPILER_SOURCE_INCLUDE_FILTER, "Include filter (regexp)",
+				this.getFieldEditorParent()));
+		this.addField(new StringFieldEditor(Preferences.COMPILER_SOURCE_EXCLUDE_FILTER, "Exclude filter (regexp)",
+				this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.COMPILER_TYPESCRIPT_FOLDER,
 				"Generated TypeScript folder (hidden when starting with '.')", this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.COMPILER_JAVASCRIPT_FOLDER, "Generated Javascript folder",
 				this.getFieldEditorParent()));
-		this.addField(new BooleanFieldEditor(Preferences.COMPILER_BUNDLE,
-				"Create bundles files from main methods (including js libs)", this.getFieldEditorParent()));
+		this.addField(new StringFieldEditor(Preferences.COMPILER_CANDY_JS_FOLDER, "Candies-extracted JavaScript folder",
+				this.getFieldEditorParent()));
+		this.addField(new BooleanFieldEditor(Preferences.COMPILER_BUNDLE, "Create browser bundle",
+				this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.COMPILER_BUNDLES_DIRECTORY,
-				"Bundles folder (in-place bundles if empty)", this.getFieldEditorParent()));
+				"Bundle folder (in-place bundle if empty)", this.getFieldEditorParent()));
 		this.addField(new RadioGroupFieldEditor(Preferences.COMPILER_DEBUG_MODE, "Debug mode and '.js.map' files", 1,
 				new String[][] {
 						{ "Java debug (Java files are accessible in the browser's debugger)",
@@ -136,7 +144,7 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 			StringFieldEditor bundlesDirectory = this.getField(Preferences.COMPILER_BUNDLES_DIRECTORY);
 			ComboFieldEditor module = this.getField(Preferences.COMPILER_MODULE_KIND);
 			if (bundle.getBooleanValue()) {
-				getPreferenceStore().setValue(Preferences.COMPILER_MODULE_KIND, "commonjs");
+				getPreferenceStore().setValue(Preferences.COMPILER_MODULE_KIND, "none");
 				module.load();
 			}
 			module.setEnabled(!bundle.getBooleanValue(), parent);

@@ -61,6 +61,7 @@ import org.jsweet.transpiler.JSweetTranspiler;
 import org.jsweet.transpiler.ModuleKind;
 import org.jsweet.transpiler.Severity;
 import org.jsweet.transpiler.SourceFile;
+import org.jsweet.transpiler.SourcePosition;
 import org.jsweet.transpiler.TranspilationHandler;
 import org.jsweet.transpiler.candies.CandiesProcessor;
 import org.jsweet.transpiler.util.Util;
@@ -323,6 +324,23 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
+	private boolean isIncluded(IPath path) {
+		if (!StringUtils.isBlank(Preferences.getSourceIncludeFilter(getProject()))) {
+			if (!path.toString().matches(Preferences.getSourceIncludeFilter(getProject()))) {
+				Log.info("excluded by included filer: " + path);
+				return false;
+			}
+		}
+		if (!StringUtils.isBlank(Preferences.getSourceExcludeFilter(getProject()))) {
+			if (path.toString().matches(Preferences.getSourceExcludeFilter(getProject()))) {
+				Log.info("excluded by excluded filer: " + path);
+				return false;
+			}
+		}
+		Log.info("include: " + path);
+		return true;
+	}
+
 	class GrabJavaFilesVisitor implements IResourceVisitor {
 		public List<File> javaFiles = new ArrayList<File>();
 		public List<IPath> sourceDirs;
@@ -340,14 +358,19 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				if (!sourceDirs.isEmpty()) {
 					for (IPath sourcePath : sourceDirs) {
 						if (sourcePath.isPrefixOf(file.getFullPath())) {
-							javaFiles.add(new File(resource.getProject().getLocation().toFile(),
-									file.getProjectRelativePath().toFile().toString()));
+							IPath relativePath = file.getFullPath().makeRelativeTo(sourcePath);
+							if (isIncluded(relativePath)) {
+								javaFiles.add(new File(resource.getProject().getLocation().toFile(),
+										file.getProjectRelativePath().toFile().toString()));
+							}
 							return true;
 						}
 					}
 				} else {
-					javaFiles.add(new File(resource.getProject().getLocation().toFile(),
-							file.getProjectRelativePath().toFile().toString()));
+					if (isIncluded(file.getProjectRelativePath())) {
+						javaFiles.add(new File(resource.getProject().getLocation().toFile(),
+								file.getProjectRelativePath().toFile().toString()));
+					}
 				}
 			}
 			// return true to continue visiting children.
@@ -386,8 +409,9 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					addMarker(getProject(), message, -1, -1, -1, problem.getSeverity() == Severity.ERROR
 							? IMarker.SEVERITY_ERROR : IMarker.SEVERITY_WARNING);
 				} else {
-					addMarker(f, message, sourcePosition.getStartLine(), sourcePosition.getStartPosition(),
-							sourcePosition.getEndPosition(), problem.getSeverity() == Severity.ERROR
+					addMarker(f, message, sourcePosition.getStartLine(),
+							sourcePosition.getStartPosition().getPosition(),
+							sourcePosition.getEndPosition().getPosition(), problem.getSeverity() == Severity.ERROR
 									? IMarker.SEVERITY_ERROR : IMarker.SEVERITY_WARNING);
 				}
 			}
@@ -525,7 +549,17 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		Log.info("JSweet: full build...");
 		getProject().deleteMarkers(JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 		List<IPath> sourceDirs = new ArrayList<>();
-		if (getProject().isNatureEnabled("org.eclipse.jdt.core.javanature")) {
+		if (!StringUtils.isEmpty(Preferences.getSourceFolders(getProject()))) {
+			String[] names = Preferences.getSourceFolders(getProject()).split("[,;]");
+			try {
+				for (String name : names) {
+					sourceDirs.add(getProject().getFolder(name).getFullPath());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (sourceDirs.isEmpty() && getProject().isNatureEnabled("org.eclipse.jdt.core.javanature")) {
 			IJavaProject javaProject = JavaCore.create(getProject());
 			IClasspathEntry[] classPathEntries = javaProject.getResolvedClasspath(true);
 			for (IClasspathEntry e : classPathEntries) {
@@ -606,7 +640,9 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			transpiler = new JSweetTranspiler(
 					new File(getProject().getLocation().toFile(), JSweetTranspiler.TMP_WORKING_DIR_NAME),
 					new File(getProject().getLocation().toFile(), Preferences.getTsOutputFolder(getProject())),
-					jsOutputFolder, classPath.toString());
+					jsOutputFolder,
+					new File(getProject().getLocation().toFile(), Preferences.getCandyJsOutputFolder(getProject())),
+					classPath.toString());
 			transpiler.setPreserveSourceLineNumbers(Preferences.isJavaDebugMode(getProject()));
 			String moduleString = Preferences.getModuleKind(getProject());
 			transpiler.setModuleKind(
