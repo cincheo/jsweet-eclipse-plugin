@@ -48,6 +48,10 @@ public class Preferences {
 
 	private static final String COMPILER_BUNDLE = "compiler.bundle";
 
+	private static final String COMPILER_DECLARATION_DIRECTORY = "compiler.declarationDirectory";
+
+	private static final String COMPILER_DECLARATION = "compiler.declaration";
+
 	private static final String COMPILER_DEBUG_MODE = "compiler.debugMode";
 
 	private static final String COMPILER_MODULE_KIND = "compiler.moduleKind";
@@ -150,6 +154,24 @@ public class Preferences {
 	public static boolean getBundle(IProject project, String profile) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
 		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_BUNDLE);
+	}
+
+	public static String DECLARATION(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION;
+	}
+
+	public static boolean getDeclaration(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION);
+	}
+
+	public static String DECLARATION_DIRECTORY(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION_DIRECTORY;
+	}
+
+	public static String getDeclarationDirectory(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION_DIRECTORY);
 	}
 
 	public static String DEBUG_MODE(String profile) {

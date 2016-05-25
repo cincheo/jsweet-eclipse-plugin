@@ -696,6 +696,16 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				context.transpiler.setBundlesDirectory(f);
 			}
 			context.transpiler.setBundle(Preferences.getBundle(context.project, context.profile));
+			context.transpiler.setGenerateDeclarations(Preferences.getDeclaration(context.project, context.profile));
+			String declarationDirectory = Preferences.getDeclarationDirectory(context.project, context.profile);
+			if (!StringUtils.isBlank(declarationDirectory)) {
+				File f = new File(declarationDirectory);
+				if (!f.isAbsolute()) {
+					f = new File(context.project.getLocation().toFile(), declarationDirectory);
+				}
+				context.transpiler.setDeclarationsOutputDir(f);
+			}
+
 			// transpiler.setTsDefDirs(new
 			// File(context.project.getLocation().toFile(),
 			// Preferences

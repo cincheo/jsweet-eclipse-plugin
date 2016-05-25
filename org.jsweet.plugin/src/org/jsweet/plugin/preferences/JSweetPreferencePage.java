@@ -184,6 +184,10 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 				this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.BUNDLES_DIRECTORY(DEFAULT_PROFILE_NAME),
 				"Bundle folder (in-place bundle if empty)", this.getFieldEditorParent()));
+		this.addField(new BooleanFieldEditor(Preferences.DECLARATION(DEFAULT_PROFILE_NAME),
+				"Generate TypeScript definitions", this.getFieldEditorParent()));
+		this.addField(new StringFieldEditor(Preferences.DECLARATION_DIRECTORY(DEFAULT_PROFILE_NAME),
+				"Definitions folder (in-place if empty)", this.getFieldEditorParent()));
 		this.addField(new RadioGroupFieldEditor(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME),
 				"Debug mode and '.js.map' files", 1,
 				new String[][] {
@@ -241,6 +245,12 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 			}
 			module.setEnabled(!bundle.getBooleanValue(), parent);
 			bundlesDirectory.setEnabled(bundle.getBooleanValue(), parent);
+
+			BooleanFieldEditor declaration = this.getField(Preferences.DECLARATION(DEFAULT_PROFILE_NAME));
+			StringFieldEditor declarationDirectory = this
+					.getField(Preferences.DECLARATION_DIRECTORY(DEFAULT_PROFILE_NAME));
+			declarationDirectory.setEnabled(declaration.getBooleanValue(), parent);
+
 		}
 
 	}
