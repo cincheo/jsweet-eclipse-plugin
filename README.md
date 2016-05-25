@@ -1,7 +1,8 @@
 # Eclipse plugin for the [JSweet transpiler](https://github.com/cincheo/jsweet)
 
-## Installation
+![screenshot](http://www.jsweet.org/wp-content/uploads/2015/11/Screen-Shot-2016-05-25-at-20.53.42.png)
 
+## Installation
 
 - Under [Eclipse](https://eclipse.org/home/index.php), go to: `Help > Install New Software`.
 - Press the "Add..." button to add the JSweet.org update site. Update site URL: `http://eclipse-update-site.jsweet.org`
