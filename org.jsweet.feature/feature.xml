@@ -2,7 +2,7 @@
 <feature
       id="org.jsweet.feature"
       label="JSweet"
-      version="0.9.3.qualifier"
+      version="0.9.4.qualifier"
       provider-name="JSweet"
       plugin="org.jsweet.plugin">
 
