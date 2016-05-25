@@ -53,7 +53,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
  */
 abstract class FieldEditorProjectPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPropertyPage {
 	private final List<FieldEditor> fields = new ArrayList<FieldEditor>();
-	private final Map<String, FieldEditor> fieldMap = new HashMap<String, FieldEditor>();
+	protected final Map<String, FieldEditor> fieldMap = new HashMap<String, FieldEditor>();
 	private Link configureWorkspaceLink;
 	private IAdaptable element;
 	private ProjectPreferenceStore projectPreferenceStore;

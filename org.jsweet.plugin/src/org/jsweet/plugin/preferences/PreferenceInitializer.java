@@ -15,6 +15,8 @@
  */
 package org.jsweet.plugin.preferences;
 
+import static org.jsweet.plugin.preferences.Preferences.DEFAULT_PROFILE_NAME;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jsweet.plugin.JSweetPlugin;
@@ -26,9 +28,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = JSweetPlugin.getDefault().getPreferenceStore();
-		store.setDefault(Preferences.COMPILER_TYPESCRIPT_FOLDER, ".generated");
-		store.setDefault(Preferences.COMPILER_JAVASCRIPT_FOLDER, "js");
-		store.setDefault(Preferences.COMPILER_DEBUG_MODE, Preferences.COMPILER_DEBUG_MODE_JAVA);
+		store.setDefault(Preferences.PROFILES(), "default");
+		store.setDefault(Preferences.TS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME), ".generated");
+		store.setDefault(Preferences.JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME), "js");
+		store.setDefault(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME), Preferences.COMPILER_DEBUG_MODE_JAVA);
 	}
 
 }

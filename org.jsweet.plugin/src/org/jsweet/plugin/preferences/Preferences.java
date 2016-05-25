@@ -15,90 +15,154 @@
  */
 package org.jsweet.plugin.preferences;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Constant definitions for plug-in preferences
  */
-public interface Preferences {
+public class Preferences {
 
-	String COMPILER_SOURCE_FOLDERS = "compiler.sourceFolders";
+	public static final String DEFAULT_PROFILE_NAME = "default";
 
-	String COMPILER_SOURCE_INCLUDE_FILTER = "compiler.sourceIncludeFilter";
+	public static final String COMPILER_DEBUG_MODE_JAVA = "java";
 
-	String COMPILER_SOURCE_EXCLUDE_FILTER = "compiler.sourceExcludeFilter";
-	
-	String COMPILER_TYPESCRIPT_FOLDER = "compiler.typescriptFolder";
+	public static final String COMPILER_DEBUG_MODE_TYPESCRIPT = "ts";
 
-	String COMPILER_JAVASCRIPT_FOLDER = "compiler.javascriptFolder";
+	private static final String COMPILER_PROFILES = "compiler.profiles";
 
-	String COMPILER_CANDY_JS_FOLDER = "compiler.candyJsFolder";
+	private static final String COMPILER_SOURCE_FOLDERS = "compiler.sourceFolders";
 
-	String COMPILER_BUNDLES_DIRECTORY = "compiler.bundlesDirectory";
+	private static final String COMPILER_SOURCE_INCLUDE_FILTER = "compiler.sourceIncludeFilter";
 
-	String COMPILER_BUNDLE = "compiler.bundle";
+	private static final String COMPILER_SOURCE_EXCLUDE_FILTER = "compiler.sourceExcludeFilter";
 
-	String COMPILER_DEBUG_MODE = "compiler.debugMode";
+	private static final String COMPILER_TYPESCRIPT_FOLDER = "compiler.typescriptFolder";
 
-	String COMPILER_MODULE_KIND = "compiler.moduleKind";
+	private static final String COMPILER_JAVASCRIPT_FOLDER = "compiler.javascriptFolder";
 
-	String COMPILER_DEBUG_MODE_JAVA = "java";
+	private static final String COMPILER_CANDY_JS_FOLDER = "compiler.candyJsFolder";
 
-	String COMPILER_DEBUG_MODE_TYPESCRIPT = "ts";
+	private static final String COMPILER_BUNDLES_DIRECTORY = "compiler.bundlesDirectory";
 
-	static String getSourceFolders(IProject project) {
-		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_SOURCE_FOLDERS);
+	private static final String COMPILER_BUNDLE = "compiler.bundle";
+
+	private static final String COMPILER_DEBUG_MODE = "compiler.debugMode";
+
+	private static final String COMPILER_MODULE_KIND = "compiler.moduleKind";
+
+	public static String getProfilePrefix(String profile) {
+		return StringUtils.isBlank(profile) || DEFAULT_PROFILE_NAME.equals(profile) ? "" : profile + ".";
 	}
 
-	static String getSourceIncludeFilter(IProject project) {
-		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_SOURCE_INCLUDE_FILTER);
+	public static String PROFILES() {
+		return Preferences.COMPILER_PROFILES;
 	}
 
-	static String getSourceExcludeFilter(IProject project) {
+	public static String getProfiles(IProject project) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_SOURCE_EXCLUDE_FILTER);
-	}
-	
-	static String getTsOutputFolder(IProject project) {
-		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_TYPESCRIPT_FOLDER);
+		return projectPreferenceStore.getString(Preferences.COMPILER_PROFILES);
 	}
 
-	static String getCandyJsOutputFolder(IProject project) {
+	public static String[] parseProfiles(IProject project) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_CANDY_JS_FOLDER);
+		String profiles = projectPreferenceStore.getString(Preferences.COMPILER_PROFILES);
+		return (profiles == null ? "" : profiles).split(";");
 	}
 
-	static String getModuleKind(IProject project) {
-		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_MODULE_KIND);
+	public static String SOURCE_FOLDERS(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_FOLDERS;
 	}
 
-	static String getJsOutputFolder(IProject project) {
+	public static String getSourceFolders(IProject project, String profile) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_JAVASCRIPT_FOLDER);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_FOLDERS);
 	}
 
-	static String getBundlesDirectory(IProject project) {
-		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_BUNDLES_DIRECTORY);
+	public static String SOURCE_INCLUDE_FILTER(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_INCLUDE_FILTER;
 	}
 
-	static boolean getBundle(IProject project) {
+	public static String getSourceIncludeFilter(IProject project, String profile) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getBoolean(Preferences.COMPILER_BUNDLE);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_INCLUDE_FILTER);
 	}
 
-	static String getDebugMode(IProject project) {
-		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(Preferences.COMPILER_DEBUG_MODE);
+	public static String SOURCE_EXCLUDE_FILTER(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_EXCLUDE_FILTER;
 	}
 
-	static boolean isJavaDebugMode(IProject project) {
-		return Preferences.COMPILER_DEBUG_MODE_JAVA.equals(Preferences.getDebugMode(project));
+	public static String getSourceExcludeFilter(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_EXCLUDE_FILTER);
+	}
+
+	public static String TS_OUTPUT_FOLDER(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_TYPESCRIPT_FOLDER;
+	}
+
+	public static String getTsOutputFolder(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_TYPESCRIPT_FOLDER);
+	}
+
+	public static String CANDY_JS_OUTPUT_FOLDER(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_CANDY_JS_FOLDER;
+	}
+
+	public static String getCandyJsOutputFolder(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_CANDY_JS_FOLDER);
+	}
+
+	public static String MODULE_KIND(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_MODULE_KIND;
+	}
+
+	public static String getModuleKind(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_MODULE_KIND);
+	}
+
+	public static String JS_OUTPUT_FOLDER(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_JAVASCRIPT_FOLDER;
+	}
+
+	public static String getJsOutputFolder(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_JAVASCRIPT_FOLDER);
+	}
+
+	public static String BUNDLES_DIRECTORY(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_BUNDLES_DIRECTORY;
+	}
+
+	public static String getBundlesDirectory(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_BUNDLES_DIRECTORY);
+	}
+
+	public static String BUNDLE(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_BUNDLE;
+	}
+
+	public static boolean getBundle(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_BUNDLE);
+	}
+
+	public static String DEBUG_MODE(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE;
+	}
+
+	public static String getDebugMode(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE);
+	}
+
+	public static boolean isJavaDebugMode(IProject project, String profile) {
+		return Preferences.COMPILER_DEBUG_MODE_JAVA.equals(Preferences.getDebugMode(project, profile));
 	}
 
 	// static IEclipsePreferences getTypescriptPluginPreferences(IProject
