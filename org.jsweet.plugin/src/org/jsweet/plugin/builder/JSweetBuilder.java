@@ -590,12 +590,17 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				e.printStackTrace();
 			}
 		}
-		if (sourceDirs.isEmpty() && context.project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
+		String jdkHome = null;
+		if (context.project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
 			IJavaProject javaProject = JavaCore.create(context.project);
 			IClasspathEntry[] classPathEntries = javaProject.getResolvedClasspath(true);
 			for (IClasspathEntry e : classPathEntries) {
-				if (e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+				if (sourceDirs.isEmpty() && e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 					sourceDirs.add(e.getPath());
+				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+					if (e.getPath().toString().endsWith("/lib/rt.jar")) {
+						jdkHome = e.getPath().removeLastSegments(2).toString();
+					}
 				}
 			}
 		}
@@ -604,6 +609,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 		context.project.accept(v);
 		context.sourceFiles.clear();
+		Log.info("init classpath, jdkHome: " + jdkHome);
+		JSweetConfig.initClassPath(jdkHome);
 		createJSweetTranspiler(context);
 		transpileFiles(context, v.javaFiles.toArray(new File[0]));
 	}
