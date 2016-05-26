@@ -591,11 +591,12 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			}
 		}
 		String jdkHome = null;
+		boolean lookupSourceFolder = sourceDirs.isEmpty();
 		if (context.project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
 			IJavaProject javaProject = JavaCore.create(context.project);
 			IClasspathEntry[] classPathEntries = javaProject.getResolvedClasspath(true);
 			for (IClasspathEntry e : classPathEntries) {
-				if (sourceDirs.isEmpty() && e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+				if (lookupSourceFolder && e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 					sourceDirs.add(e.getPath());
 				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
 					if (e.getPath().toString().endsWith("/lib/rt.jar")) {
