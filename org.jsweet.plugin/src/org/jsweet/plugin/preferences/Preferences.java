@@ -52,6 +52,8 @@ public class Preferences {
 
 	private static final String COMPILER_DECLARATION = "compiler.declaration";
 
+	private static final String COMPILER_NO_JS = "compiler.nojs";
+
 	private static final String COMPILER_DEBUG_MODE = "compiler.debugMode";
 
 	private static final String COMPILER_MODULE_KIND = "compiler.moduleKind";
@@ -185,6 +187,19 @@ public class Preferences {
 
 	public static boolean isJavaDebugMode(IProject project, String profile) {
 		return Preferences.COMPILER_DEBUG_MODE_JAVA.equals(Preferences.getDebugMode(project, profile));
+	}
+
+	public static String NO_JS(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_NO_JS;
+	}
+
+	public static boolean getNoJs(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_NO_JS);
+	}
+
+	public static boolean isNoJs(IProject project, String profile) {
+		return Preferences.COMPILER_NO_JS.equals(Preferences.getNoJs(project, profile));
 	}
 
 	// static IEclipsePreferences getTypescriptPluginPreferences(IProject

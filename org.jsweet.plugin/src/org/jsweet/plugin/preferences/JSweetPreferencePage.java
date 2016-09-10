@@ -176,6 +176,8 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 				"Exclude filter (regexp)", this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.TS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME),
 				"Generated TypeScript folder", this.getFieldEditorParent()));
+		this.addField(new BooleanFieldEditor(Preferences.NO_JS(DEFAULT_PROFILE_NAME),
+				"Do not generate JavaScript", this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME),
 				"Generated Javascript folder", this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.CANDY_JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME),

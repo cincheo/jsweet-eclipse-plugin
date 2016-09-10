@@ -683,6 +683,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					new File(context.project.getLocation().toFile(),
 							Preferences.getCandyJsOutputFolder(context.project, context.profile)),
 					classPath.toString());
+			context.transpiler.setGenerateJsFiles(Preferences.isNoJs(context.project, context.profile));
 			context.transpiler
 					.setPreserveSourceLineNumbers(Preferences.isJavaDebugMode(context.project, context.profile));
 			String moduleString = Preferences.getModuleKind(context.project, context.profile);
