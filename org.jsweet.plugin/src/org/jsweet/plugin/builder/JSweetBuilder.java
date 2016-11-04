@@ -419,12 +419,14 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					f = (IFile) context.project
 							.findMember(sourcePosition.getFile().getAbsolutePath().substring(base.length() + 1));
 				} catch (Exception e) {
+					Log.error(message, e);
 					// swallow
 				}
 				if (f == null) {
 					try {
 						f = (IFile) context.project.findMember(sourcePosition.getFile().getPath());
 					} catch (Exception e) {
+						Log.error(message, e);
 						// swallow
 					}
 				}
@@ -683,7 +685,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					new File(context.project.getLocation().toFile(),
 							Preferences.getCandyJsOutputFolder(context.project, context.profile)),
 					classPath.toString());
-			context.transpiler.setGenerateJsFiles(Preferences.isNoJs(context.project, context.profile));
+			context.transpiler.setGenerateJsFiles(!Preferences.getNoJs(context.project, context.profile));
 			context.transpiler
 					.setPreserveSourceLineNumbers(Preferences.isJavaDebugMode(context.project, context.profile));
 			String moduleString = Preferences.getModuleKind(context.project, context.profile);
@@ -715,6 +717,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			if (context.USE_WATCH_MODE) {
 				context.transpiler.setTscWatchMode(true);
 			}
+			Log.info("created JSweet transpiler: " + context.transpiler);
 		} catch (NoClassDefFoundError error) {
 			new JSweetTranspilationHandler(context).report(JSweetProblem.JAVA_COMPILER_NOT_FOUND, null,
 					JSweetProblem.JAVA_COMPILER_NOT_FOUND.getMessage());

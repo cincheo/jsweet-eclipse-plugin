@@ -198,17 +198,4 @@ public class Preferences {
 		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_NO_JS);
 	}
 
-	public static boolean isNoJs(IProject project, String profile) {
-		return Preferences.COMPILER_NO_JS.equals(Preferences.getNoJs(project, profile));
-	}
-
-	// static IEclipsePreferences getTypescriptPluginPreferences(IProject
-	// project) {
-	// IScopeContext projectScope = new ProjectScope(project);
-	// return projectScope.getNode("com.palantir.typescript");
-	// }
-
-	// String TS_PLUGIN_SRC_FOLDER = "build.path.sourceFolder";
-	// String TS_PLUGIN_OUTPUT_FOLDER = "compiler.outputDirOption";
-
 }
