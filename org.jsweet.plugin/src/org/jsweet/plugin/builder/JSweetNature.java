@@ -28,7 +28,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.jsweet.plugin.Log;
 import org.jsweet.transpiler.JSweetTranspiler;
-import org.jsweet.transpiler.candies.CandiesProcessor;
+import org.jsweet.transpiler.candy.CandyProcessor;
 
 public class JSweetNature implements IProjectNature {
 
@@ -76,7 +76,7 @@ public class JSweetNature implements IProjectNature {
 					IClasspathEntry e = JavaCore.newLibraryEntry(
 							project.getLocation().append(
 									JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-											+ CandiesProcessor.CANDIES_PROCESSED_DIR_NAME), null, null);
+											+ CandyProcessor.CANDIES_DIR_NAME), null, null);
 					if (ArrayUtils.contains(cp, e)) {
 						Log.info("removing " + e + " from build path");
 						cp = ArrayUtils.remove(cp, ArrayUtils.indexOf(cp, e));
