@@ -51,6 +51,9 @@
    <feature url="features/org.jsweet.feature_0.9.4.201612161335.jar" id="org.jsweet.feature" version="0.9.4.201612161335">
       <category name="JSweet"/>
    </feature>
+   <feature url="features/org.jsweet.feature_0.9.5.201708102202.jar" id="org.jsweet.feature" version="0.9.5.201708102202">
+      <category name="JSweet"/>
+   </feature>
    <category-def name="JSweet" label="JSweet">
       <description>
          The JSweet transpiler Eclipse plugin

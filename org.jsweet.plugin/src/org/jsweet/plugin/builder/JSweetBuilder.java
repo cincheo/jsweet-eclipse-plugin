@@ -56,6 +56,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.jsweet.JSweetConfig;
 import org.jsweet.plugin.Log;
 import org.jsweet.plugin.preferences.Preferences;
+import org.jsweet.transpiler.JSweetFactory;
 import org.jsweet.transpiler.JSweetProblem;
 import org.jsweet.transpiler.JSweetTranspiler;
 import org.jsweet.transpiler.ModuleKind;
@@ -63,7 +64,7 @@ import org.jsweet.transpiler.Severity;
 import org.jsweet.transpiler.SourceFile;
 import org.jsweet.transpiler.SourcePosition;
 import org.jsweet.transpiler.TranspilationHandler;
-import org.jsweet.transpiler.candies.CandiesProcessor;
+import org.jsweet.transpiler.candy.CandyProcessor;
 import org.jsweet.transpiler.util.Util;
 
 public class JSweetBuilder extends IncrementalProjectBuilder {
@@ -140,12 +141,12 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			IJavaProject javaProject = JavaCore.create(project);
 			IClasspathEntry[] cp = javaProject.getRawClasspath();
 			File processed = project.getLocation().append(JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-					+ CandiesProcessor.CANDIES_PROCESSED_DIR_NAME).toFile();
+					+ CandyProcessor.CANDIES_DIR_NAME).toFile();
 			IClasspathEntry e = javaProject
 					.decodeClasspathEntry("<classpathentry kind=\"lib\" path=\"" + JSweetTranspiler.TMP_WORKING_DIR_NAME
-							+ File.separator + CandiesProcessor.CANDIES_PROCESSED_DIR_NAME + "\" sourcepath=\""
+							+ File.separator + CandyProcessor.CANDIES_DIR_NAME + "\" sourcepath=\""
 							+ JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-							+ CandiesProcessor.CANDIES_SOURCES_DIR_NAME + "\" />");
+							+ CandyProcessor.CANDIES_SOURCES_DIR_NAME + "\" />");
 			if (project.isNatureEnabled(JSweetNature.ID)) {
 				if (!processed.exists()) {
 					processed.mkdirs();
@@ -677,7 +678,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		File jsOutputFolder = new File(context.project.getLocation().toFile(),
 				Preferences.getJsOutputFolder(context.project, context.profile));
 		try {
-			context.transpiler = new JSweetTranspiler(
+			JSweetFactory factory = new JSweetFactory();
+			context.transpiler = new JSweetTranspiler(factory,
 					new File(context.project.getLocation().toFile(), JSweetTranspiler.TMP_WORKING_DIR_NAME),
 					new File(context.project.getLocation().toFile(),
 							Preferences.getTsOutputFolder(context.project, context.profile)),
@@ -692,12 +694,12 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			context.transpiler.setModuleKind(
 					StringUtils.isBlank(moduleString) ? ModuleKind.none : ModuleKind.valueOf(moduleString));
 			String bundleDirectory = Preferences.getBundlesDirectory(context.project, context.profile);
-			if (!StringUtils.isBlank(bundleDirectory)) {
+			if (!StringUtils.isBlank(bundleDirectory) && Preferences.getBundle(context.project, context.profile)) {
 				File f = new File(bundleDirectory);
 				if (!f.isAbsolute()) {
 					f = new File(context.project.getLocation().toFile(), bundleDirectory);
 				}
-				context.transpiler.setBundlesDirectory(f);
+				context.transpiler.setJsOutputDir(f);
 			}
 			context.transpiler.setBundle(Preferences.getBundle(context.project, context.profile));
 			context.transpiler.setGenerateDeclarations(Preferences.getDeclaration(context.project, context.profile));
