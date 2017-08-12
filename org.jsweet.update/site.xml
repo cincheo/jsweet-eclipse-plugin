@@ -33,6 +33,24 @@
    <feature url="features/org.jsweet.feature_0.9.4.201605251802.jar" id="org.jsweet.feature" version="0.9.4.201605251802">
       <category name="JSweet"/>
    </feature>
+   <feature url="features/org.jsweet.feature_0.9.4.201605260823.jar" id="org.jsweet.feature" version="0.9.4.201605260823">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.4.201609110806.jar" id="org.jsweet.feature" version="0.9.4.201609110806">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.4.201611032238.jar" id="org.jsweet.feature" version="0.9.4.201611032238">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.4.201611040322.jar" id="org.jsweet.feature" version="0.9.4.201611040322">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.4.201611230926.jar" id="org.jsweet.feature" version="0.9.4.201611230926">
+      <category name="JSweet"/>
+   </feature>
+   <feature url="features/org.jsweet.feature_0.9.4.201612161335.jar" id="org.jsweet.feature" version="0.9.4.201612161335">
+      <category name="JSweet"/>
+   </feature>
    <category-def name="JSweet" label="JSweet">
       <description>
          The JSweet transpiler Eclipse plugin
