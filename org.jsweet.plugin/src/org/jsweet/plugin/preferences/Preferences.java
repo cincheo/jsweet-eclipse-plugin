@@ -26,10 +26,6 @@ public class Preferences {
 
 	public static final String DEFAULT_PROFILE_NAME = "default";
 
-	public static final String COMPILER_DEBUG_MODE_JAVA = "java";
-
-	public static final String COMPILER_DEBUG_MODE_TYPESCRIPT = "ts";
-
 	private static final String COMPILER_PROFILES = "compiler.profiles";
 
 	private static final String COMPILER_SOURCE_FOLDERS = "compiler.sourceFolders";
@@ -180,13 +176,9 @@ public class Preferences {
 		return getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE;
 	}
 
-	public static String getDebugMode(IProject project, String profile) {
+	public static boolean isDebugMode(IProject project, String profile) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
-		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE);
-	}
-
-	public static boolean isJavaDebugMode(IProject project, String profile) {
-		return Preferences.COMPILER_DEBUG_MODE_JAVA.equals(Preferences.getDebugMode(project, profile));
+		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE);
 	}
 
 	public static String NO_JS(String profile) {

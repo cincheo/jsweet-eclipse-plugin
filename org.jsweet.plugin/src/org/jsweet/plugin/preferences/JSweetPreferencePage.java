@@ -15,7 +15,6 @@ import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
@@ -190,14 +189,8 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 				"Generate TypeScript definitions", this.getFieldEditorParent()));
 		this.addField(new StringFieldEditor(Preferences.DECLARATION_DIRECTORY(DEFAULT_PROFILE_NAME),
 				"Definitions folder (in-place if empty)", this.getFieldEditorParent()));
-		this.addField(new RadioGroupFieldEditor(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME),
-				"Debug mode and '.js.map' files", 1,
-				new String[][] {
-						{ "Java debug (Java files are accessible in the browser's debugger)",
-								Preferences.COMPILER_DEBUG_MODE_JAVA },
-						{ "Typescript debug (Typescript files are pretty printed and used for debugging)",
-								Preferences.COMPILER_DEBUG_MODE_TYPESCRIPT } },
-				getFieldEditorParent()));
+		this.addField(new BooleanFieldEditor(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME),
+				"Debug mode (generate '.js.map' files)", this.getFieldEditorParent()));
 		this.addField(new ComboFieldEditor(Preferences.MODULE_KIND(DEFAULT_PROFILE_NAME), "Module kind",
 				new String[][] { new String[] { "none", "none" }, new String[] { "commonjs", "commonjs" },
 						new String[] { "amd", "amd" }, new String[] { "system", "system" },

@@ -15,20 +15,12 @@
  */
 package org.jsweet.plugin.builder;
 
-import java.io.File;
-
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.jsweet.plugin.Log;
-import org.jsweet.transpiler.JSweetTranspiler;
-import org.jsweet.transpiler.candy.CandyProcessor;
 
 public class JSweetNature implements IProjectNature {
 
@@ -70,19 +62,6 @@ public class JSweetNature implements IProjectNature {
 				System.arraycopy(commands, i + 1, newCommands, i, commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				project.setDescription(description, null);
-				if (getProject().isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-					IJavaProject javaProject = JavaCore.create(getProject());
-					IClasspathEntry[] cp = javaProject.getRawClasspath();
-					IClasspathEntry e = JavaCore.newLibraryEntry(
-							project.getLocation().append(
-									JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-											+ CandyProcessor.CANDIES_DIR_NAME), null, null);
-					if (ArrayUtils.contains(cp, e)) {
-						Log.info("removing " + e + " from build path");
-						cp = ArrayUtils.remove(cp, ArrayUtils.indexOf(cp, e));
-						javaProject.setRawClasspath(cp, null);
-					}
-				}
 				return;
 			}
 		}

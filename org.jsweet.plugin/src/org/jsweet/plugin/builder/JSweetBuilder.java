@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -64,7 +63,6 @@ import org.jsweet.transpiler.Severity;
 import org.jsweet.transpiler.SourceFile;
 import org.jsweet.transpiler.SourcePosition;
 import org.jsweet.transpiler.TranspilationHandler;
-import org.jsweet.transpiler.candy.CandyProcessor;
 import org.jsweet.transpiler.util.Util;
 
 public class JSweetBuilder extends IncrementalProjectBuilder {
@@ -136,43 +134,11 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	private static void autoFillClassPath(IProject project) throws CoreException {
-		if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-			IJavaProject javaProject = JavaCore.create(project);
-			IClasspathEntry[] cp = javaProject.getRawClasspath();
-			File processed = project.getLocation().append(JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-					+ CandyProcessor.CANDIES_DIR_NAME).toFile();
-			IClasspathEntry e = javaProject
-					.decodeClasspathEntry("<classpathentry kind=\"lib\" path=\"" + JSweetTranspiler.TMP_WORKING_DIR_NAME
-							+ File.separator + CandyProcessor.CANDIES_DIR_NAME + "\" sourcepath=\""
-							+ JSweetTranspiler.TMP_WORKING_DIR_NAME + File.separator
-							+ CandyProcessor.CANDIES_SOURCES_DIR_NAME + "\" />");
-			if (project.isNatureEnabled(JSweetNature.ID)) {
-				if (!processed.exists()) {
-					processed.mkdirs();
-					project.refreshLocal(IResource.DEPTH_INFINITE, null);
-				}
-				if (!ArrayUtils.contains(cp, e)) {
-					Log.info("adding " + e + " to build path");
-					cp = ArrayUtils.add(cp, 0, e);
-					javaProject.setRawClasspath(cp, true, null);
-				}
-			} else {
-				if (ArrayUtils.contains(cp, e)) {
-					Log.info("removing " + e + " from build path");
-					cp = ArrayUtils.remove(cp, ArrayUtils.indexOf(cp, e));
-					javaProject.setRawClasspath(cp, true, null);
-				}
-			}
-		}
-	}
-
 	public static void clean(IProject project, IProgressMonitor monitor) throws CoreException {
 		// adds processed class directory to the build path to ensure that
 		// mixins are available
 		File tmp = project.getLocation().append(JSweetTranspiler.TMP_WORKING_DIR_NAME).toFile();
 		FileUtils.deleteQuietly(tmp);
-		autoFillClassPath(project);
 		// delete markers set and files created
 		for (String profile : Preferences.parseProfiles(project)) {
 			cleanFiles(new BuildingContext(project, profile));
@@ -689,7 +655,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					classPath.toString());
 			context.transpiler.setGenerateJsFiles(!Preferences.getNoJs(context.project, context.profile));
 			context.transpiler
-					.setPreserveSourceLineNumbers(Preferences.isJavaDebugMode(context.project, context.profile));
+					.setPreserveSourceLineNumbers(Preferences.isDebugMode(context.project, context.profile));
 			String moduleString = Preferences.getModuleKind(context.project, context.profile);
 			context.transpiler.setModuleKind(
 					StringUtils.isBlank(moduleString) ? ModuleKind.none : ModuleKind.valueOf(moduleString));

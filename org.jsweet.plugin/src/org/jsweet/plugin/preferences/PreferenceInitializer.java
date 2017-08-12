@@ -31,7 +31,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(Preferences.PROFILES(), "default");
 		store.setDefault(Preferences.TS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME), ".generated");
 		store.setDefault(Preferences.JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME), "js");
-		store.setDefault(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME), Preferences.COMPILER_DEBUG_MODE_JAVA);
 	}
 
 }
