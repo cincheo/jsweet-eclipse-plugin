@@ -645,7 +645,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				Preferences.getJsOutputFolder(context.project, context.profile));
 		try {
 			JSweetFactory factory = new JSweetFactory();
-			context.transpiler = new JSweetTranspiler(factory,
+			Log.info("creating transpiler with configuration file: " + new File(context.project.getLocation().toFile(), "jsweetconfig.json"));
+			context.transpiler = new JSweetTranspiler(new File(context.project.getLocation().toFile(), "jsweetconfig.json"), factory,
 					new File(context.project.getLocation().toFile(), JSweetTranspiler.TMP_WORKING_DIR_NAME),
 					new File(context.project.getLocation().toFile(),
 							Preferences.getTsOutputFolder(context.project, context.profile)),
