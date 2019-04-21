@@ -55,6 +55,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.jsweet.JSweetConfig;
 import org.jsweet.plugin.Log;
 import org.jsweet.plugin.preferences.Preferences;
+import org.jsweet.transpiler.EcmaScriptComplianceLevel;
 import org.jsweet.transpiler.JSweetFactory;
 import org.jsweet.transpiler.JSweetProblem;
 import org.jsweet.transpiler.JSweetTranspiler;
@@ -656,10 +657,15 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					classPath.toString());
 			context.transpiler.setGenerateJsFiles(!Preferences.getNoJs(context.project, context.profile));
 			context.transpiler
-					.setPreserveSourceLineNumbers(Preferences.isDebugMode(context.project, context.profile));
+					.setDebugMode(Preferences.isDebugMode(context.project, context.profile));
 			String moduleString = Preferences.getModuleKind(context.project, context.profile);
 			context.transpiler.setModuleKind(
 					StringUtils.isBlank(moduleString) ? ModuleKind.none : ModuleKind.valueOf(moduleString));
+			
+			String ecmaTargetVersionString = Preferences.getEcmaTargetVersion(context.project, context.profile);
+			context.transpiler.setEcmaTargetVersion(
+					StringUtils.isBlank(ecmaTargetVersionString) ? EcmaScriptComplianceLevel.ES5 : EcmaScriptComplianceLevel.valueOf(ecmaTargetVersionString));
+			
 			String bundleDirectory = Preferences.getBundlesDirectory(context.project, context.profile);
 			if (!StringUtils.isBlank(bundleDirectory) && Preferences.getBundle(context.project, context.profile)) {
 				File f = new File(bundleDirectory);

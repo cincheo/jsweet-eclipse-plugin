@@ -192,9 +192,20 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 		this.addField(new BooleanFieldEditor(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME),
 				"Debug mode (generate '.js.map' files)", this.getFieldEditorParent()));
 		this.addField(new ComboFieldEditor(Preferences.MODULE_KIND(DEFAULT_PROFILE_NAME), "Module kind",
-				new String[][] { new String[] { "none", "none" }, new String[] { "commonjs", "commonjs" },
-						new String[] { "amd", "amd" }, new String[] { "system", "system" },
+				new String[][] { new String[] { "none", "none" },
+						new String[] { "es2015", "es2015" },
+						new String[] { "commonjs", "commonjs" },
+						new String[] { "amd", "amd" }, 
+						new String[] { "system", "system" },
 						new String[] { "umd", "umd" } },
+				getFieldEditorParent()));
+		
+		this.addField(new ComboFieldEditor(Preferences.ECMA_TARGET_VERSION(DEFAULT_PROFILE_NAME), "Target ECMA version",
+				new String[][] { 
+						new String[] { "ES6", "ES6" },
+						new String[] { "ES5", "ES5" },
+						new String[] { "ES3", "ES3" }
+				},
 				getFieldEditorParent()));
 	}
 
