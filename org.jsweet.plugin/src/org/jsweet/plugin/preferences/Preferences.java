@@ -53,6 +53,8 @@ public class Preferences {
 	private static final String COMPILER_DEBUG_MODE = "compiler.debugMode";
 
 	private static final String COMPILER_MODULE_KIND = "compiler.moduleKind";
+	
+	private static final String COMPILER_ECMA_TARGET_VERSION = "compiler.target";
 
 	public static String getProfilePrefix(String profile) {
 		return StringUtils.isBlank(profile) || DEFAULT_PROFILE_NAME.equals(profile) ? "" : profile + ".";
@@ -125,6 +127,15 @@ public class Preferences {
 	public static String getModuleKind(IProject project, String profile) {
 		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_MODULE_KIND);
+	}
+	
+	public static String ECMA_TARGET_VERSION(String profile) {
+		return getProfilePrefix(profile) + Preferences.COMPILER_ECMA_TARGET_VERSION;
+	}
+
+	public static String getEcmaTargetVersion(IProject project, String profile) {
+		IPreferenceStore projectPreferenceStore = new ProjectPreferenceStore(project);
+		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_ECMA_TARGET_VERSION);
 	}
 
 	public static String JS_OUTPUT_FOLDER(String profile) {
