@@ -15,6 +15,7 @@
  */
 package org.jsweet.plugin.preferences;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -195,12 +196,20 @@ abstract class FieldEditorProjectPreferencePage extends FieldEditorPreferencePag
 
 	private IPreferencePage newPreferencePage() {
 		try {
-			final IPreferencePage preferencePage = this.getClass().newInstance();
+			final IPreferencePage preferencePage = this.getClass().getConstructor().newInstance();
 			preferencePage.setTitle(getTitle());
 			return preferencePage;
-		} catch (final IllegalAccessException e) {
+		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
-		} catch (final InstantiationException e) {
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (SecurityException e) {
 			throw new RuntimeException(e);
 		}
 	}

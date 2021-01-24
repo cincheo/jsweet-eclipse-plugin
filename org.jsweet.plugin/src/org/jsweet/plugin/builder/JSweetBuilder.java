@@ -18,7 +18,6 @@ package org.jsweet.plugin.builder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -60,35 +58,12 @@ import org.jsweet.transpiler.JSweetFactory;
 import org.jsweet.transpiler.JSweetProblem;
 import org.jsweet.transpiler.JSweetTranspiler;
 import org.jsweet.transpiler.ModuleKind;
-import org.jsweet.transpiler.Severity;
 import org.jsweet.transpiler.SourceFile;
-import org.jsweet.transpiler.SourcePosition;
-import org.jsweet.transpiler.TranspilationHandler;
 import org.jsweet.transpiler.util.Util;
 
 public class JSweetBuilder extends IncrementalProjectBuilder {
 
 	public static final String ID = "org.jsweet.plugin.jsweetBuilder";
-	public static final String JSWEET_PROBLEM_MARKER_TYPE = "org.jsweet.plugin.jsweetProblem";
-
-	private static final String[] DEFAULT_FAVORITES = { JSweetConfig.LANG_PACKAGE + "." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
-			JSweetConfig.UTIL_CLASSNAME + ".*", JSweetConfig.DOM_PACKAGE + "." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
-			JSweetConfig.LIBS_PACKAGE + ".jquery." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
-			JSweetConfig.LIBS_PACKAGE + ".underscore." + JSweetConfig.GLOBALS_CLASS_NAME + ".*" };
-
-	static class BuildingContext {
-		public final String profile;
-		public final IProject project;
-		// watch mode does not work (yet?) under Windows, so we do not use it
-		public boolean useWatchMode = false;
-		public final Map<File, SourceFile> sourceFiles = new HashMap<>();
-		public JSweetTranspiler transpiler;
-
-		public BuildingContext(IProject project, String profile) {
-			this.project = project;
-			this.profile = profile;
-		}
-	}
 
 	private static boolean hasFile(File folder) {
 		if (folder.isDirectory()) {
@@ -108,10 +83,10 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 	private static void cleanFiles(BuildingContext context) throws CoreException {
 		try {
-			context.project.deleteMarkers(JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
+			context.project.deleteMarkers(JSweetConsts.JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 			File tsOutDir = new File(context.project.getLocation().toFile(),
 					Preferences.getTsOutputFolder(context.project, context.profile));
-			LinkedList<File> files = new LinkedList<>();
+			List<File> files = new ArrayList<>();
 			if (tsOutDir.exists()) {
 				Util.addFiles(".ts", tsOutDir, files);
 				for (File f : files) {
@@ -137,6 +112,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			context.project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
+			Log.error(e);
 		}
 	}
 
@@ -149,6 +125,11 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		for (String profile : Preferences.parseProfiles(project)) {
 			cleanFiles(new BuildingContext(project, profile));
 		}
+	}
+
+	@Override
+	protected void clean(final IProgressMonitor monitor) throws CoreException {
+		clean(getProject(), monitor);
 	}
 
 	/**
@@ -171,6 +152,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 	/**
 	 * Forces a full clean rebuild of the given JSweet project.
+	 *
+	 * @param project
 	 */
 	public static void rebuildProject(IProject project) {
 		rebuildProjects(Arrays.asList(project));
@@ -178,6 +161,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 	/**
 	 * Forces a clean of the given JSweet project.
+	 *
+	 * @param project
 	 */
 	public static void cleanProject(IProject project) {
 		rebuildProjects(Arrays.asList(project));
@@ -190,7 +175,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					for (IProject project : projects) {
-						if (project.isOpen() && project.hasNature(JSweetNature.ID)) {
+						if (project.isAccessible() && project.hasNature(JSweetNature.ID)) {
 							project.build(IncrementalProjectBuilder.CLEAN_BUILD, JSweetBuilder.ID, null, monitor);
 							project.build(IncrementalProjectBuilder.FULL_BUILD, JSweetBuilder.ID, null, monitor);
 						}
@@ -241,7 +226,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			IFile resourceFile = (IFile) resource;
 			File file = new File(resource.getProject().getLocation().toFile(),
 					resourceFile.getProjectRelativePath().toFile().toString());
-			if (!javaFiles.contains(file)) {
+			if (!javaFiles.contains(file) //
+					&& isIncluded(context, resourceFile.getProjectRelativePath())) {
 				javaFiles.add(file);
 				javaResourceFiles.add(resourceFile);
 				IPackageFragment packge = project.findPackageFragment(resource.getParent().getFullPath());
@@ -255,7 +241,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 										resourceFile = (IFile) r;
 										file = new File(r.getProject().getLocation().toFile(),
 												resourceFile.getProjectRelativePath().toFile().toString());
-										if (!javaFiles.contains(file)) {
+										if (!javaFiles.contains(file) //
+												&& isIncluded(context, r.getProjectRelativePath())) {
 											javaFiles.add(file);
 											javaResourceFiles.add(resourceFile);
 										}
@@ -305,6 +292,9 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				case IResourceDelta.CHANGED:
 					grabJavaFileHierarchy(resource);
 					break;
+				default:
+					// return true to continue visiting children.
+					return true;
 				}
 			}
 			// return true to continue visiting children.
@@ -329,7 +319,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		return true;
 	}
 
-	class GrabJavaFilesVisitor implements IResourceVisitor {
+	private static class GrabJavaFilesVisitor implements IResourceVisitor {
 		private BuildingContext context;
 		public List<File> javaFiles = new ArrayList<File>();
 		public List<IPath> sourceDirs;
@@ -339,6 +329,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			this.sourceDirs = sourceDirs;
 		}
 
+		@Override
 		public boolean visit(IResource resource) {
 			if (resource instanceof IFile && resource.getName().endsWith(".java")) {
 				IFile file = (IFile) resource;
@@ -368,112 +359,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	class JSweetTranspilationHandler implements TranspilationHandler {
-
-		BuildingContext context;
-
-		public JSweetTranspilationHandler(BuildingContext context) {
-			this.context = context;
-		}
-
-		@Override
-		public void report(JSweetProblem problem, SourcePosition sourcePosition, String message) {
-			if (problem == JSweetProblem.INTERNAL_JAVA_ERROR) {
-				// ignore Java errors because they will be reported by Eclipse
-				return;
-			}
-			String base = context.project.getLocation().toFile().getAbsolutePath();
-			if (sourcePosition == null || sourcePosition.getFile() == null) {
-				addMarker(context.project, message, -1, -1, -1,
-						problem.getSeverity() == Severity.ERROR ? IMarker.SEVERITY_ERROR : IMarker.SEVERITY_WARNING);
-			} else {
-				IFile f = null;
-				try {
-					f = (IFile) context.project
-							.findMember(sourcePosition.getFile().getAbsolutePath().substring(base.length() + 1));
-				} catch (Exception e) {
-					Log.error(message, e);
-					// swallow
-				}
-				if (f == null) {
-					try {
-						f = (IFile) context.project.findMember(sourcePosition.getFile().getPath());
-					} catch (Exception e) {
-						Log.error(message, e);
-						// swallow
-					}
-				}
-				if (f == null) {
-					addMarker(context.project, message, -1, -1, -1, problem.getSeverity() == Severity.ERROR
-							? IMarker.SEVERITY_ERROR : IMarker.SEVERITY_WARNING);
-				} else {
-					addMarker(f, message, sourcePosition.getStartLine(),
-							sourcePosition.getStartPosition().getPosition(),
-							sourcePosition.getEndPosition().getPosition(), problem.getSeverity() == Severity.ERROR
-									? IMarker.SEVERITY_ERROR : IMarker.SEVERITY_WARNING);
-				}
-			}
-		}
-
-		@Override
-		public void onCompleted(JSweetTranspiler transpiler, boolean fullPass, SourceFile[] files) {
-			try {
-				if (fullPass) {
-					Log.info("refreshing worspace (full)");
-					context.project.refreshLocal(IResource.DEPTH_INFINITE, null);
-				} else {
-					// TODO: refresh only the resources that have changed (using
-					// the files argument)
-					Log.info("refreshing output directories (incremental)");
-					final IResource output = context.project
-							.findMember(Preferences.getTsOutputFolder(context.project, context.profile));
-					final IResource jsOutput = context.project
-							.findMember(Preferences.getJsOutputFolder(context.project, context.profile));
-					if (output != null || jsOutput != null) {
-						new Thread() {
-							public void run() {
-								try {
-									if (output != null) {
-										output.refreshLocal(IResource.DEPTH_INFINITE, null);
-									}
-									if (jsOutput != null && !jsOutput.equals(output)) {
-										jsOutput.refreshLocal(IResource.DEPTH_INFINITE, null);
-									}
-								} catch (CoreException e) {
-									Log.error("error while refreshing", e);
-								}
-							}
-						}.start();
-					}
-				}
-
-			} catch (Exception e) {
-				Log.error(e);
-			}
-		}
-
-	}
-
-	private void addMarker(IResource resource, String message, int lineNumber, int charStart, int charEnd,
-			int severity) {
-		try {
-			IMarker marker = resource.createMarker(JSWEET_PROBLEM_MARKER_TYPE);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-			if (lineNumber >= 0) {
-				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-			}
-			if (charStart >= 0) {
-				marker.setAttribute(IMarker.CHAR_START, charStart);
-			}
-			if (charEnd >= 0) {
-				marker.setAttribute(IMarker.CHAR_END, charEnd);
-			}
-		} catch (CoreException e) {
-			Log.error(e);
-		}
-	}
-
+	@Override
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
 		// Only full builds are supported for now... incremental builds should
 		// be supported later if possible
@@ -500,7 +386,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		try {
 			IPreferenceStore s = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.eclipse.jdt.ui");
 			String favorites = s.getString(PreferenceConstants.CODEASSIST_FAVORITE_STATIC_MEMBERS);
-			for (String f : DEFAULT_FAVORITES) {
+			for (String f : JSweetConsts.DEFAULT_FAVORITES) {
 				if (!favorites.contains(f)) {
 					if (!favorites.isEmpty()) {
 						favorites += ";";
@@ -515,15 +401,10 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	@Override
-	protected void clean(IProgressMonitor monitor) throws CoreException {
-		clean(getProject(), monitor);
-	}
-
 	private void deleteMarkers(IFile... files) {
 		try {
 			for (IFile file : files) {
-				file.deleteMarkers(JSWEET_PROBLEM_MARKER_TYPE, false, IResource.DEPTH_ZERO);
+				file.deleteMarkers(JSweetConsts.JSWEET_PROBLEM_MARKER_TYPE, false, IResource.DEPTH_ZERO);
 			}
 		} catch (CoreException ce) {
 			Log.error(ce);
@@ -548,7 +429,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 	private void fullBuild(BuildingContext context, final IProgressMonitor monitor) throws CoreException {
 		Log.info("JSweet: full build...");
-		context.project.deleteMarkers(JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
+		context.project.deleteMarkers(JSweetConsts.JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 		List<IPath> sourceDirs = new ArrayList<>();
 		if (!StringUtils.isEmpty(Preferences.getSourceFolders(context.project, context.profile))) {
 			String[] names = Preferences.getSourceFolders(context.project, context.profile).split("[,;]");
@@ -558,6 +439,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				Log.error(e);
 			}
 		}
 		String jdkHome = null;
@@ -613,7 +495,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				IncrementalGrabJavaFileVisitor v = new IncrementalGrabJavaFileVisitor(javaProject, context);
 				delta.accept(v);
 				deleteMarkers(v.javaResourceFiles.toArray(new IFile[0]));
-				context.project.deleteMarkers(JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_ZERO);
+				context.project.deleteMarkers(JSweetConsts.JSWEET_PROBLEM_MARKER_TYPE, true, IResource.DEPTH_ZERO);
 				if (context.transpiler == null) {
 					createJSweetTranspiler(context);
 				}
@@ -646,8 +528,10 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				Preferences.getJsOutputFolder(context.project, context.profile));
 		try {
 			JSweetFactory factory = new JSweetFactory();
-			Log.info("creating transpiler with configuration file: " + new File(context.project.getLocation().toFile(), "jsweetconfig.json"));
-			context.transpiler = new JSweetTranspiler(new File(context.project.getLocation().toFile(), "jsweetconfig.json"), factory,
+			Log.info("creating transpiler with configuration file: "
+					+ new File(context.project.getLocation().toFile(), "jsweetconfig.json"));
+			context.transpiler = new JSweetTranspiler(
+					new File(context.project.getLocation().toFile(), "jsweetconfig.json"), factory,
 					new File(context.project.getLocation().toFile(), JSweetTranspiler.TMP_WORKING_DIR_NAME),
 					new File(context.project.getLocation().toFile(),
 							Preferences.getTsOutputFolder(context.project, context.profile)),
@@ -656,16 +540,16 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 							Preferences.getCandyJsOutputFolder(context.project, context.profile)),
 					classPath.toString());
 			context.transpiler.setGenerateJsFiles(!Preferences.getNoJs(context.project, context.profile));
-			context.transpiler
-					.setDebugMode(Preferences.isDebugMode(context.project, context.profile));
+			context.transpiler.setDebugMode(Preferences.isDebugMode(context.project, context.profile));
 			String moduleString = Preferences.getModuleKind(context.project, context.profile);
 			context.transpiler.setModuleKind(
 					StringUtils.isBlank(moduleString) ? ModuleKind.none : ModuleKind.valueOf(moduleString));
-			
+
 			String ecmaTargetVersionString = Preferences.getEcmaTargetVersion(context.project, context.profile);
-			context.transpiler.setEcmaTargetVersion(
-					StringUtils.isBlank(ecmaTargetVersionString) ? EcmaScriptComplianceLevel.ES5 : EcmaScriptComplianceLevel.valueOf(ecmaTargetVersionString));
-			
+			context.transpiler
+					.setEcmaTargetVersion(StringUtils.isBlank(ecmaTargetVersionString) ? EcmaScriptComplianceLevel.ES5
+							: EcmaScriptComplianceLevel.valueOf(ecmaTargetVersionString));
+
 			String bundleDirectory = Preferences.getBundlesDirectory(context.project, context.profile);
 			if (!StringUtils.isBlank(bundleDirectory) && Preferences.getBundle(context.project, context.profile)) {
 				File f = new File(bundleDirectory);

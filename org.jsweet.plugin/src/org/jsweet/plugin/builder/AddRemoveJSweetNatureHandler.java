@@ -47,6 +47,10 @@ public class AddRemoveJSweetNatureHandler extends AbstractHandler {
 	 *            to have JSweet nature added or removed
 	 */
 	private void toggleNature(IProject project) throws CoreException {
+		// Shortcut: project not accessible
+		if (!project.isAccessible())
+			return;
+
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 
