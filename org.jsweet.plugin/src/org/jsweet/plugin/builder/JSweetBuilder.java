@@ -71,11 +71,16 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 	public static final String ID = "org.jsweet.plugin.jsweetBuilder";
 	public static final String JSWEET_PROBLEM_MARKER_TYPE = "org.jsweet.plugin.jsweetProblem";
 
+	private static final String[] DEFAULT_FAVORITES = { JSweetConfig.LANG_PACKAGE + "." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
+			JSweetConfig.UTIL_CLASSNAME + ".*", JSweetConfig.DOM_PACKAGE + "." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
+			JSweetConfig.LIBS_PACKAGE + ".jquery." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
+			JSweetConfig.LIBS_PACKAGE + ".underscore." + JSweetConfig.GLOBALS_CLASS_NAME + ".*" };
+
 	static class BuildingContext {
 		public final String profile;
 		public final IProject project;
 		// watch mode does not work (yet?) under Windows, so we do not use it
-		public boolean USE_WATCH_MODE = false;
+		public boolean useWatchMode = false;
 		public final Map<File, SourceFile> sourceFiles = new HashMap<>();
 		public JSweetTranspiler transpiler;
 
@@ -269,7 +274,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			if (resource instanceof IFile && resource.getName().endsWith(".java")) {
 				switch (delta.getKind()) {
 				case IResourceDelta.ADDED:
-					if (context.USE_WATCH_MODE && context.transpiler != null) {
+					if (context.useWatchMode && context.transpiler != null) {
 						context.transpiler.resetTscWatchMode();
 					}
 					grabJavaFileHierarchy(resource);
@@ -277,7 +282,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				case IResourceDelta.REMOVED:
 					deleteMarkers((IFile) resource);
 					SourceFile sf;
-					if (context.USE_WATCH_MODE && context.transpiler != null) {
+					if (context.useWatchMode && context.transpiler != null) {
 						File file = new File(resource.getProject().getLocation().toFile(),
 								((IFile) resource).getProjectRelativePath().toFile().toString());
 						sf = context.transpiler.getWatchedFile(file);
@@ -491,16 +496,11 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
-	private String[] defaultFavorites = { JSweetConfig.LANG_PACKAGE + "." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
-			JSweetConfig.UTIL_CLASSNAME + ".*", JSweetConfig.DOM_PACKAGE + "." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
-			JSweetConfig.LIBS_PACKAGE + ".jquery." + JSweetConfig.GLOBALS_CLASS_NAME + ".*",
-			JSweetConfig.LIBS_PACKAGE + ".underscore." + JSweetConfig.GLOBALS_CLASS_NAME + ".*" };
-
 	private void forceStaticImports() {
 		try {
 			IPreferenceStore s = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.eclipse.jdt.ui");
 			String favorites = s.getString(PreferenceConstants.CODEASSIST_FAVORITE_STATIC_MEMBERS);
-			for (String f : defaultFavorites) {
+			for (String f : DEFAULT_FAVORITES) {
 				if (!favorites.contains(f)) {
 					if (!favorites.isEmpty()) {
 						favorites += ";";
@@ -627,7 +627,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 	}
 
 	private void createJSweetTranspiler(BuildingContext context) throws CoreException {
-		if (context.USE_WATCH_MODE && context.transpiler != null) {
+		if (context.useWatchMode && context.transpiler != null) {
 			Log.info("stopping tsc watch mode");
 			context.transpiler.setTscWatchMode(false);
 			Log.info("tsc watch mode stopped");
@@ -689,7 +689,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			// File(context.project.getLocation().toFile(),
 			// Preferences
 			// .getTsOutputFolder(context.project)));
-			if (context.USE_WATCH_MODE) {
+			if (context.useWatchMode) {
 				context.transpiler.setTscWatchMode(true);
 			}
 			Log.info("created JSweet transpiler: " + context.transpiler);

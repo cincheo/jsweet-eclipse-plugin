@@ -26,11 +26,12 @@ import org.jsweet.plugin.JSweetPlugin;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = JSweetPlugin.getDefault().getPreferenceStore();
-		store.setDefault(Preferences.PROFILES(), "default");
-		store.setDefault(Preferences.TS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME), ".generated");
-		store.setDefault(Preferences.JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME), "js");
+		store.setDefault(Preferences.profiles(), "default");
+		store.setDefault(Preferences.tsOutputDir(DEFAULT_PROFILE_NAME), ".generated");
+		store.setDefault(Preferences.jsOutputDir(DEFAULT_PROFILE_NAME), "js");
 	}
 
 }

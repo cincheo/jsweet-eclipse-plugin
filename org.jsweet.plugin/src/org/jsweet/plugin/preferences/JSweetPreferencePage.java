@@ -96,7 +96,7 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 	private void applyProfile(String profile) {
 		currentProfile = profile;
 		for (Entry<String, FieldEditor> entry : fieldMap.entrySet()) {
-			if (Preferences.PROFILES().equals(entry.getKey())) {
+			if (Preferences.profiles().equals(entry.getKey())) {
 				continue;
 			}
 			entry.getValue().setPreferenceName(Preferences.getProfilePrefix(currentProfile) + entry.getKey());
@@ -107,7 +107,7 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 	@Override
 	protected void createFieldEditors() {
 		if (this.isPropertyPage()) {
-			this.addField(profileSelector = new ListSelectorFieldEditor(Preferences.PROFILES(), "Profile",
+			this.addField(profileSelector = new ListSelectorFieldEditor(Preferences.profiles(), "Profile",
 					getFieldEditorParent()));
 			profileSelector.getCombo().addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -129,15 +129,15 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 				public void widgetSelected(SelectionEvent e) {
 					InputDialog d = new InputDialog(null, "Create new profile", "Enter a profile name", "",
 							new IInputValidator() {
-						@Override
-						public String isValid(String name) {
-							if (name.matches("[a-zA-Z0-9]")) {
-								return name;
-							} else {
-								return null;
-							}
-						}
-					});
+								@Override
+								public String isValid(String name) {
+									if (name.matches("[a-zA-Z0-9]")) {
+										return name;
+									} else {
+										return null;
+									}
+								}
+							});
 					if (d.open() == Window.OK) {
 						if (!StringUtils.isBlank(d.getValue())) {
 							profileSelector.addValue(d.getValue());
@@ -167,46 +167,46 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 
 		}
 
-		this.addField(new StringFieldEditor(Preferences.SOURCE_FOLDERS(DEFAULT_PROFILE_NAME),
-				"Source folders (project ones if empty)", this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.SOURCE_INCLUDE_FILTER(DEFAULT_PROFILE_NAME),
-				"Include filter (regexp)", this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.SOURCE_EXCLUDE_FILTER(DEFAULT_PROFILE_NAME),
-				"Exclude filter (regexp)", this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.TS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME),
-				"Generated TypeScript folder", this.getFieldEditorParent()));
-		this.addField(new BooleanFieldEditor(Preferences.NO_JS(DEFAULT_PROFILE_NAME),
-				"Do not generate JavaScript", this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME),
-				"Generated Javascript folder", this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.CANDY_JS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME),
-				"Candies-extracted JavaScript folder", this.getFieldEditorParent()));
-		this.addField(new BooleanFieldEditor(Preferences.BUNDLE(DEFAULT_PROFILE_NAME), "Create browser bundle",
-				this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.BUNDLES_DIRECTORY(DEFAULT_PROFILE_NAME),
-				"Bundle folder (in-place bundle if empty)", this.getFieldEditorParent()));
-		this.addField(new BooleanFieldEditor(Preferences.DECLARATION(DEFAULT_PROFILE_NAME),
-				"Generate TypeScript definitions", this.getFieldEditorParent()));
-		this.addField(new StringFieldEditor(Preferences.DECLARATION_DIRECTORY(DEFAULT_PROFILE_NAME),
-				"Definitions folder (in-place if empty)", this.getFieldEditorParent()));
-		this.addField(new BooleanFieldEditor(Preferences.DEBUG_MODE(DEFAULT_PROFILE_NAME),
-				"Debug mode (generate '.js.map' files)", this.getFieldEditorParent()));
-		this.addField(new ComboFieldEditor(Preferences.MODULE_KIND(DEFAULT_PROFILE_NAME), "Module kind",
-				new String[][] { new String[] { "none", "none" },
-						new String[] { "es2015", "es2015" },
-						new String[] { "commonjs", "commonjs" },
-						new String[] { "amd", "amd" }, 
-						new String[] { "system", "system" },
-						new String[] { "umd", "umd" } },
+		addField(new StringFieldEditor(Preferences.srcDirs(DEFAULT_PROFILE_NAME),
+				"Source folders (project ones if empty)", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.srcIncludeFilter(DEFAULT_PROFILE_NAME), //
+				"Include filter (regexp)", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.srcExcludeFilter(DEFAULT_PROFILE_NAME), //
+				"Exclude filter (regexp)", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.tsOutputDir(DEFAULT_PROFILE_NAME), //
+				"Generated TypeScript folder", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.noJs(DEFAULT_PROFILE_NAME), //
+				"Do not generate JavaScript", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.jsOutputDir(DEFAULT_PROFILE_NAME), //
+				"Generated Javascript folder", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.candyJsOutputDir(DEFAULT_PROFILE_NAME),
+				"Candies-extracted JavaScript folder", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.bundle(DEFAULT_PROFILE_NAME), //
+				"Create browser bundle", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.bundlesDir(DEFAULT_PROFILE_NAME),
+				"Bundle folder (in-place bundle if empty)", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.declaration(DEFAULT_PROFILE_NAME),
+				"Generate TypeScript definitions", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.declarationDir(DEFAULT_PROFILE_NAME),
+				"Definitions folder (in-place if empty)", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.debugMode(DEFAULT_PROFILE_NAME),
+				"Debug mode (generate '.js.map' files)", getFieldEditorParent()));
+		addField(new ComboFieldEditor(Preferences.moduleKind(DEFAULT_PROFILE_NAME), //
+				"Module kind", new String[][] { //
+						new String[] { "none", "none" }, //
+						new String[] { "es2015", "es2015" }, //
+						new String[] { "commonjs", "commonjs" }, //
+						new String[] { "amd", "amd" }, //
+						new String[] { "system", "system" }, //
+						new String[] { "umd", "umd" } }, //
 				getFieldEditorParent()));
-		
-		this.addField(new ComboFieldEditor(Preferences.ECMA_TARGET_VERSION(DEFAULT_PROFILE_NAME), "Target ECMA version",
-				new String[][] { 
-						new String[] { "ES6", "ES6" },
-						new String[] { "ES5", "ES5" },
-						new String[] { "ES3", "ES3" }
-				},
-				getFieldEditorParent()));
+
+		addField(new ComboFieldEditor(Preferences.ecmaTargetVersion(DEFAULT_PROFILE_NAME), //
+				"Target ECMA version", new String[][] { //
+						new String[] { "ES6", "ES6" }, //
+						new String[] { "ES5", "ES5" }, //
+						new String[] { "ES3", "ES3" } //
+				}, getFieldEditorParent()));
 	}
 
 	@Override
@@ -221,7 +221,7 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 
 	@Override
 	protected String getSentinelPropertyName() {
-		return Preferences.TS_OUTPUT_FOLDER(DEFAULT_PROFILE_NAME);
+		return Preferences.tsOutputDir(DEFAULT_PROFILE_NAME);
 	}
 
 	@Override
@@ -240,21 +240,20 @@ public final class JSweetPreferencePage extends FieldEditorProjectPreferencePage
 	protected void updateFieldEditors() {
 		super.updateFieldEditors();
 		// update editor states if needed
-		if (this.isPageEnabled()) {
-			Composite parent = this.getFieldEditorParent();
-			BooleanFieldEditor bundle = this.getField(Preferences.BUNDLE(DEFAULT_PROFILE_NAME));
-			StringFieldEditor bundlesDirectory = this.getField(Preferences.BUNDLES_DIRECTORY(DEFAULT_PROFILE_NAME));
-			ComboFieldEditor module = this.getField(Preferences.MODULE_KIND(DEFAULT_PROFILE_NAME));
+		if (isPageEnabled()) {
+			Composite parent = getFieldEditorParent();
+			BooleanFieldEditor bundle = this.getField(Preferences.bundle(DEFAULT_PROFILE_NAME));
+			StringFieldEditor bundlesDirectory = this.getField(Preferences.bundlesDir(DEFAULT_PROFILE_NAME));
+			ComboFieldEditor module = this.getField(Preferences.moduleKind(DEFAULT_PROFILE_NAME));
 			if (bundle.getBooleanValue()) {
-				getPreferenceStore().setValue(Preferences.MODULE_KIND(currentProfile), "none");
+				getPreferenceStore().setValue(Preferences.moduleKind(currentProfile), "none");
 				module.load();
 			}
 			module.setEnabled(!bundle.getBooleanValue(), parent);
 			bundlesDirectory.setEnabled(bundle.getBooleanValue(), parent);
 
-			BooleanFieldEditor declaration = this.getField(Preferences.DECLARATION(DEFAULT_PROFILE_NAME));
-			StringFieldEditor declarationDirectory = this
-					.getField(Preferences.DECLARATION_DIRECTORY(DEFAULT_PROFILE_NAME));
+			BooleanFieldEditor declaration = this.getField(Preferences.declaration(DEFAULT_PROFILE_NAME));
+			StringFieldEditor declarationDirectory = this.getField(Preferences.declarationDir(DEFAULT_PROFILE_NAME));
 			declarationDirectory.setEnabled(declaration.getBooleanValue(), parent);
 
 		}

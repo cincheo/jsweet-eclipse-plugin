@@ -52,24 +52,25 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
  * Adapted from the TypeScript Eclipse plugin (author: dcicerone).
  */
 abstract class FieldEditorProjectPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPropertyPage {
-	private final List<FieldEditor> fields = new ArrayList<FieldEditor>();
-	protected final Map<String, FieldEditor> fieldMap = new HashMap<String, FieldEditor>();
+
+	private final List<FieldEditor> fields = new ArrayList<>();
+	protected final Map<String, FieldEditor> fieldMap = new HashMap<>();
 	private Link configureWorkspaceLink;
 	private IAdaptable element;
 	private ProjectPreferenceStore projectPreferenceStore;
 	private Button projectSpecificCheckbox;
 
-	protected FieldEditorProjectPreferencePage(int style) {
+	protected FieldEditorProjectPreferencePage(final int style) {
 		super(style);
 	}
 
 	@Override
 	public IAdaptable getElement() {
-		return this.element;
+		return element;
 	}
 
 	@Override
-	public void setElement(IAdaptable element) {
+	public void setElement(final IAdaptable element) {
 		this.element = element;
 	}
 
@@ -78,110 +79,110 @@ abstract class FieldEditorProjectPreferencePage extends FieldEditorPreferencePag
 	protected abstract String getSentinelPropertyName();
 
 	@Override
-	protected Control createContents(Composite parent) {
-		if (this.isPropertyPage()) { // properties page
-			Composite composite = new Composite(parent, SWT.NONE);
-			GridLayout layout = new GridLayout(2, false);
+	protected Control createContents(final Composite parent) {
+		if (isPropertyPage()) { // properties page
+			final Composite composite = new Composite(parent, SWT.NONE);
+			final GridLayout layout = new GridLayout(2, false);
 			layout.marginWidth = 0;
 			layout.marginHeight = 0;
 			composite.setLayout(layout);
 			composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 			// enable project specific settings
-			this.projectSpecificCheckbox = new Button(composite, SWT.CHECK);
-			this.projectSpecificCheckbox.setFont(parent.getFont());
-			this.projectSpecificCheckbox.setSelection(this.projectPreferenceStore.getProjectSpecificSettings());
-			this.projectSpecificCheckbox.setText("Enable project specific settings");
-			this.projectSpecificCheckbox.addSelectionListener(new SelectionAdapter() {
+			projectSpecificCheckbox = new Button(composite, SWT.CHECK);
+			projectSpecificCheckbox.setFont(parent.getFont());
+			projectSpecificCheckbox.setSelection(projectPreferenceStore.getProjectSpecificSettings());
+			projectSpecificCheckbox.setText("Enable project specific settings");
+			projectSpecificCheckbox.addSelectionListener(new SelectionAdapter() {
 				@Override
-				public void widgetSelected(SelectionEvent e) {
-					boolean projectSpecific = isProjectSpecific();
-					FieldEditorProjectPreferencePage.this.projectPreferenceStore.setProjectSpecificSettings(projectSpecific);
-					FieldEditorProjectPreferencePage.this.configureWorkspaceLink.setEnabled(!projectSpecific);
+				public void widgetSelected(final SelectionEvent e) {
+					final boolean projectSpecific = isProjectSpecific();
+					projectPreferenceStore.setProjectSpecificSettings(projectSpecific);
+					configureWorkspaceLink.setEnabled(!projectSpecific);
 					updateFieldEditors();
 				}
 			});
 			// configure workspace settings
-			this.configureWorkspaceLink = new Link(composite, SWT.NONE);
-			this.configureWorkspaceLink.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-			this.configureWorkspaceLink.setText("<a>Configure Workspace Settings...</a>");
-			this.configureWorkspaceLink.addSelectionListener(new SelectionAdapter() {
+			configureWorkspaceLink = new Link(composite, SWT.NONE);
+			configureWorkspaceLink.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+			configureWorkspaceLink.setText("<a>Configure Workspace Settings...</a>");
+			configureWorkspaceLink.addSelectionListener(new SelectionAdapter() {
 				@Override
-				public void widgetSelected(SelectionEvent e) {
+				public void widgetSelected(final SelectionEvent e) {
 					configureWorkspaceSettings();
 				}
 			});
 			// horizontal separator
-			Label horizontalSeparator = new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
+			final Label horizontalSeparator = new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
 			horizontalSeparator.setLayoutData(new GridData(GridData.FILL, SWT.TOP, true, false, 2, 1));
 		}
 		return super.createContents(parent);
 	}
 
 	@Override
-	public void createControl(Composite parent) {
-		if (this.isPropertyPage()) {
-			IProject project = (IProject) this.element.getAdapter(IProject.class);
-			String sentinelPropertyName = this.getSentinelPropertyName();
-			this.projectPreferenceStore = new ProjectPreferenceStore(project, super.getPreferenceStore(), sentinelPropertyName);
+	public void createControl(final Composite parent) {
+		if (isPropertyPage()) {
+			final IProject project = element.getAdapter(IProject.class);
+			final String sentinelPropertyName = getSentinelPropertyName();
+			projectPreferenceStore = new ProjectPreferenceStore(project, super.getPreferenceStore(),
+					sentinelPropertyName);
 		}
 		super.createControl(parent);
-		if (this.isPropertyPage()) {
-			this.updateFieldEditors();
+		if (isPropertyPage()) {
+			updateFieldEditors();
 		}
 	}
 
 	@Override
 	public IPreferenceStore getPreferenceStore() {
-		if (this.projectPreferenceStore != null) {
-			return this.projectPreferenceStore;
-		}
+		if (projectPreferenceStore != null)
+			return projectPreferenceStore;
 		return super.getPreferenceStore();
 	}
 
 	@Override
-	protected void addField(FieldEditor editor) {
-		this.fields.add(editor);
-		this.fieldMap.put(editor.getPreferenceName(), editor);
+	protected void addField(final FieldEditor editor) {
+		fields.add(editor);
+		fieldMap.put(editor.getPreferenceName(), editor);
 		super.addField(editor);
 	}
 
 	protected final boolean isPageEnabled() {
-		return !this.isPropertyPage() || this.isProjectSpecific();
+		return !isPropertyPage() || isProjectSpecific();
 	}
 
 	protected final boolean isPropertyPage() {
-		return this.element != null;
+		return element != null;
 	}
 
 	protected final boolean isProjectSpecific() {
-		return this.isPropertyPage() && this.projectSpecificCheckbox.getSelection();
+		return isPropertyPage() && projectSpecificCheckbox.getSelection();
 	}
 
 	@Override
 	protected void performDefaults() {
-		if (this.isPropertyPage()) {
-			this.projectSpecificCheckbox.setSelection(false);
-			this.configureWorkspaceLink.setEnabled(false);
-			this.updateFieldEditors();
+		if (isPropertyPage()) {
+			projectSpecificCheckbox.setSelection(false);
+			configureWorkspaceLink.setEnabled(false);
+			updateFieldEditors();
 		}
 		super.performDefaults();
 	}
 
 	protected void updateFieldEditors() {
-		boolean pageEnabled = this.isPageEnabled();
-		Composite parent = this.getFieldEditorParent();
-		for (FieldEditor field : this.fields) {
+		final boolean pageEnabled = isPageEnabled();
+		final Composite parent = getFieldEditorParent();
+		for (final FieldEditor field : fields) {
 			field.setEnabled(pageEnabled, parent);
 		}
 	}
 
 	private void configureWorkspaceSettings() {
-		String preferenceNodeId = this.getPreferenceNodeId();
-		IPreferencePage preferencePage = newPreferencePage();
+		final String preferenceNodeId = getPreferenceNodeId();
+		final IPreferencePage preferencePage = newPreferencePage();
 		final IPreferenceNode preferenceNode = new PreferenceNode(preferenceNodeId, preferencePage);
-		PreferenceManager manager = new PreferenceManager();
+		final PreferenceManager manager = new PreferenceManager();
 		manager.addToRoot(preferenceNode);
-		final PreferenceDialog dialog = new PreferenceDialog(this.getControl().getShell(), manager);
+		final PreferenceDialog dialog = new PreferenceDialog(getControl().getShell(), manager);
 		BusyIndicator.showWhile(this.getControl().getDisplay(), new Runnable() {
 			@Override
 			public void run() {
@@ -194,12 +195,12 @@ abstract class FieldEditorProjectPreferencePage extends FieldEditorPreferencePag
 
 	private IPreferencePage newPreferencePage() {
 		try {
-			IPreferencePage preferencePage = this.getClass().newInstance();
-			preferencePage.setTitle(this.getTitle());
+			final IPreferencePage preferencePage = this.getClass().newInstance();
+			preferencePage.setTitle(getTitle());
 			return preferencePage;
-		} catch (IllegalAccessException e) {
+		} catch (final IllegalAccessException e) {
 			throw new RuntimeException(e);
-		} catch (InstantiationException e) {
+		} catch (final InstantiationException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -209,8 +210,8 @@ abstract class FieldEditorProjectPreferencePage extends FieldEditorPreferencePag
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends FieldEditor> T getField(String preferenceName) {
-		return (T)fieldMap.get(preferenceName);
+	public <T extends FieldEditor> T getField(final String preferenceName) {
+		return (T) fieldMap.get(preferenceName);
 	}
 
 }

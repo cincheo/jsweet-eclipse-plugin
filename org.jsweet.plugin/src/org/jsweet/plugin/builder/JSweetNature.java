@@ -31,6 +31,7 @@ public class JSweetNature implements IProjectNature {
 
 	private IProject project;
 
+	@Override
 	public void configure() throws CoreException {
 		Log.info("configure JSweet nature");
 		IProjectDescription desc = project.getDescription();
@@ -51,6 +52,7 @@ public class JSweetNature implements IProjectNature {
 		project.setDescription(desc, null);
 	}
 
+	@Override
 	public void deconfigure() throws CoreException {
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();
@@ -67,10 +69,12 @@ public class JSweetNature implements IProjectNature {
 		}
 	}
 
+	@Override
 	public IProject getProject() {
 		return project;
 	}
 
+	@Override
 	public void setProject(IProject project) {
 		Log.info("JSweet nature: set project");
 		this.project = project;
