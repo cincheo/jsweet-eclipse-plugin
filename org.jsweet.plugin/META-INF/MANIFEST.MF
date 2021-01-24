@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: lib/jsweet-transpiler-latest-jar-with-dependencies.jar,
+Bundle-ClassPath: lib/jsweet-transpiler-3.0.0-jar-with-dependencies.jar,
  external:$JAVA_HOME$/../lib/tools.jar,
  external:$JAVA_HOME$/lib/tools.jar,
  external:$JAVA_HOME$/../Classes/classes.jar,

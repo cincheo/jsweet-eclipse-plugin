@@ -18,7 +18,6 @@ package org.jsweet.plugin.builder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +58,7 @@ import org.jsweet.transpiler.JSweetProblem;
 import org.jsweet.transpiler.JSweetTranspiler;
 import org.jsweet.transpiler.ModuleKind;
 import org.jsweet.transpiler.SourceFile;
-import org.jsweet.transpiler.util.Util;
+import org.jsweet.transpiler.util.Util.Static;
 
 public class JSweetBuilder extends IncrementalProjectBuilder {
 
@@ -88,7 +87,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 					Preferences.getTsOutputFolder(context.project, context.profile));
 			List<File> files = new ArrayList<>();
 			if (tsOutDir.exists()) {
-				Util.addFiles(".ts", tsOutDir, files);
+				Static.addFiles(".ts", tsOutDir, files);
 				for (File f : files) {
 					FileUtils.deleteQuietly(f);
 				}
@@ -100,8 +99,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			File jsOutDir = new File(context.project.getLocation().toFile(),
 					Preferences.getJsOutputFolder(context.project, context.profile));
 			if (jsOutDir.exists()) {
-				Util.addFiles(".js", jsOutDir, files);
-				Util.addFiles(".js.map", jsOutDir, files);
+				Static.addFiles(".js", jsOutDir, files);
+				Static.addFiles(".js.map", jsOutDir, files);
 				for (File f : files) {
 					FileUtils.deleteQuietly(f);
 				}
@@ -214,8 +213,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 	class IncrementalGrabJavaFileVisitor implements IResourceDeltaVisitor {
 		private IJavaProject project;
 		private BuildingContext context;
-		public List<File> javaFiles = new ArrayList<File>();
-		public List<IFile> javaResourceFiles = new ArrayList<IFile>();
+		public List<File> javaFiles = new ArrayList<>();
+		public List<IFile> javaResourceFiles = new ArrayList<>();
 
 		public IncrementalGrabJavaFileVisitor(IJavaProject project, BuildingContext context) {
 			this.project = project;
@@ -256,6 +255,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 			}
 		}
 
+		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
 			if (resource instanceof IFile && resource.getName().endsWith(".java")) {
@@ -321,7 +321,7 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 
 	private static class GrabJavaFilesVisitor implements IResourceVisitor {
 		private BuildingContext context;
-		public List<File> javaFiles = new ArrayList<File>();
+		public List<File> javaFiles = new ArrayList<>();
 		public List<IPath> sourceDirs;
 
 		public GrabJavaFilesVisitor(BuildingContext context, List<IPath> sourceDirs) {
@@ -451,7 +451,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 				if (lookupSourceFolder && e.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 					sourceDirs.add(e.getPath());
 				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-					if (e.getPath().toString().endsWith("/lib/rt.jar")) {
+					if (e.getPath().toString().endsWith("/lib/rt.jar") || e.getPath().toString().endsWith(
+							"/lib/jrt-fs.jar")) {
 						jdkHome = e.getPath().removeLastSegments(2).toString();
 					}
 				}
@@ -463,7 +464,8 @@ public class JSweetBuilder extends IncrementalProjectBuilder {
 		context.project.accept(v);
 		context.sourceFiles.clear();
 		Log.info("init classpath, jdkHome: " + jdkHome);
-		JSweetConfig.initClassPath(jdkHome);
+		// TODO to fix? method removed
+		// JSweetConfig.jinitClassPath(jdkHome);
 		createJSweetTranspiler(context);
 		transpileFiles(context, v.javaFiles.toArray(new File[0]));
 	}
