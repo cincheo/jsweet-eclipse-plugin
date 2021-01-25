@@ -15,6 +15,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class AddRemoveJSweetNatureHandler extends AbstractHandler {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection) {
@@ -46,6 +47,10 @@ public class AddRemoveJSweetNatureHandler extends AbstractHandler {
 	 *            to have JSweet nature added or removed
 	 */
 	private void toggleNature(IProject project) throws CoreException {
+		// Shortcut: project not accessible
+		if (!project.isAccessible())
+			return;
+
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 

@@ -53,14 +53,14 @@ public class Preferences {
 	private static final String COMPILER_DEBUG_MODE = "compiler.debugMode";
 
 	private static final String COMPILER_MODULE_KIND = "compiler.moduleKind";
-	
+
 	private static final String COMPILER_ECMA_TARGET_VERSION = "compiler.target";
 
 	public static String getProfilePrefix(String profile) {
 		return StringUtils.isBlank(profile) || DEFAULT_PROFILE_NAME.equals(profile) ? "" : profile + ".";
 	}
 
-	public static String PROFILES() {
+	public static String profiles() {
 		return Preferences.COMPILER_PROFILES;
 	}
 
@@ -75,7 +75,7 @@ public class Preferences {
 		return (profiles == null ? "" : profiles).split(";");
 	}
 
-	public static String SOURCE_FOLDERS(String profile) {
+	public static String srcDirs(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_FOLDERS;
 	}
 
@@ -84,7 +84,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_FOLDERS);
 	}
 
-	public static String SOURCE_INCLUDE_FILTER(String profile) {
+	public static String srcIncludeFilter(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_INCLUDE_FILTER;
 	}
 
@@ -93,7 +93,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_INCLUDE_FILTER);
 	}
 
-	public static String SOURCE_EXCLUDE_FILTER(String profile) {
+	public static String srcExcludeFilter(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_EXCLUDE_FILTER;
 	}
 
@@ -102,7 +102,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_SOURCE_EXCLUDE_FILTER);
 	}
 
-	public static String TS_OUTPUT_FOLDER(String profile) {
+	public static String tsOutputDir(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_TYPESCRIPT_FOLDER;
 	}
 
@@ -111,7 +111,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_TYPESCRIPT_FOLDER);
 	}
 
-	public static String CANDY_JS_OUTPUT_FOLDER(String profile) {
+	public static String candyJsOutputDir(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_CANDY_JS_FOLDER;
 	}
 
@@ -120,7 +120,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_CANDY_JS_FOLDER);
 	}
 
-	public static String MODULE_KIND(String profile) {
+	public static String moduleKind(String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_MODULE_KIND;
 	}
 
@@ -129,7 +129,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_MODULE_KIND);
 	}
 	
-	public static String ECMA_TARGET_VERSION(String profile) {
+	public static String ecmaTargetVersion(String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_ECMA_TARGET_VERSION;
 	}
 
@@ -138,7 +138,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_ECMA_TARGET_VERSION);
 	}
 
-	public static String JS_OUTPUT_FOLDER(String profile) {
+	public static String jsOutputDir(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_JAVASCRIPT_FOLDER;
 	}
 
@@ -147,7 +147,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_JAVASCRIPT_FOLDER);
 	}
 
-	public static String BUNDLES_DIRECTORY(String profile) {
+	public static String bundlesDir(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_BUNDLES_DIRECTORY;
 	}
 
@@ -156,7 +156,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_BUNDLES_DIRECTORY);
 	}
 
-	public static String BUNDLE(String profile) {
+	public static String bundle(String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_BUNDLE;
 	}
 
@@ -165,7 +165,7 @@ public class Preferences {
 		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_BUNDLE);
 	}
 
-	public static String DECLARATION(String profile) {
+	public static String declaration(String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION;
 	}
 
@@ -174,7 +174,7 @@ public class Preferences {
 		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION);
 	}
 
-	public static String DECLARATION_DIRECTORY(String profile) {
+	public static String declarationDir(final String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION_DIRECTORY;
 	}
 
@@ -183,7 +183,7 @@ public class Preferences {
 		return projectPreferenceStore.getString(getProfilePrefix(profile) + Preferences.COMPILER_DECLARATION_DIRECTORY);
 	}
 
-	public static String DEBUG_MODE(String profile) {
+	public static String debugMode(String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE;
 	}
 
@@ -192,7 +192,7 @@ public class Preferences {
 		return projectPreferenceStore.getBoolean(getProfilePrefix(profile) + Preferences.COMPILER_DEBUG_MODE);
 	}
 
-	public static String NO_JS(String profile) {
+	public static String noJs(String profile) {
 		return getProfilePrefix(profile) + Preferences.COMPILER_NO_JS;
 	}
 

@@ -21,7 +21,7 @@ public class ListSelectorFieldEditor extends FieldEditor {
 
 	/**
 	 * Create the field editor.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -39,6 +39,7 @@ public class ListSelectorFieldEditor extends FieldEditor {
 	 * 
 	 * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
 	 */
+	@Override
 	protected void adjustForNumColumns(int numColumns) {
 		if (numColumns > 1) {
 			Control control = getLabelControl();
@@ -59,11 +60,10 @@ public class ListSelectorFieldEditor extends FieldEditor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.
-	 * widgets.Composite, int)
+	 *
+	 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt. widgets.Composite, int)
 	 */
+	@Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
 		int comboC = 1;
 		if (numColumns > 1) {
@@ -83,27 +83,30 @@ public class ListSelectorFieldEditor extends FieldEditor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
 	 */
+	@Override
 	protected void doLoad() {
 		updateComboForValue(getPreferenceStore().getString(getPreferenceName()));
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
 	 */
+	@Override
 	protected void doLoadDefault() {
 		updateComboForValue(getPreferenceStore().getDefaultString(getPreferenceName()));
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
 	 */
+	@Override
 	protected void doStore() {
 		if (values == null) {
 			getPreferenceStore().setToDefault(getPreferenceName());
@@ -114,9 +117,10 @@ public class ListSelectorFieldEditor extends FieldEditor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
 	 */
+	@Override
 	public int getNumberOfControls() {
 		return 2;
 	}
@@ -179,6 +183,7 @@ public class ListSelectorFieldEditor extends FieldEditor {
 	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean,
 	 * org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		getComboBoxControl(parent).setEnabled(enabled);
